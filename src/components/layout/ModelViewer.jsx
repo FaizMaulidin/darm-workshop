@@ -29,8 +29,8 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
     scene.background = new THREE.Color(backgroundColor);
 
     const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-    camera.position.set(-27, 36, 33);
-    gsap.to(camera.position, {duration: 2, x: -0.9, y: 1.2, z: 1.1})
+    camera.position.set(-16, 32, -26);
+    gsap.to(camera.position, {duration: 2, x: -1.3, y: 1.6, z: -0.8})
 
     // Lights
     const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
@@ -38,7 +38,7 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
     scene.add(hemi);
 
     const dir = new THREE.DirectionalLight(0xffffff, 1.0);
-    dir.position.set(5, 10, 7);
+    dir.position.set(-5, 10, 7);
     dir.castShadow = enableShadows;
     dir.shadow.mapSize.set(2048, 2048);
     dir.shadow.camera.left = -5;
@@ -54,7 +54,7 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
-    controls.screenSpacePanning = true;
+    controls.enablePan = false
     controls.minPolarAngle = 0;           // minimum angle (down)
     controls.maxPolarAngle = Math.PI / 2;
     controls.minDistance = 0.5;
@@ -68,7 +68,11 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
       modelPath,
       (gltf) => {
         model = gltf.scene || gltf.scenes[0];
-        // Optional: center and scale model
+
+        model.getObjectByName("WP_Body").visible = false
+        model.getObjectByName("WP_Piston").visible = false
+        model.getObjectByName("WP_Spring").visible = false
+        model.getObjectByName("WP_Cap").visible = false
         
         model.position.set(-0.1, 0.8, -0.08); // move center to origin
 
@@ -127,23 +131,24 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
           bodyClone: bodyClone,
           createClone: createClone
         };
-
+        
         if(mode === "simulation") {
-          if (modelContext.current.handlePartsMovement.fullSimulation()){
-            modelContext.current.handlePartsMovement.fullSimulation().kill()
-          }
-          modelContext.current.handlePartsMovement.fullSimulation()
           modelContext.current.runSimulation = true
+          modelContext.current.handlePartsMovement.fullSimulation()
         } else {
-          modelContext.current.busy = false
+          modelContext.current.runSimulation = false
+          modelContext.current.status.busy = false
+          modelContext.current.status.gpOpened = false
           model.attach(modelContext.current.partsRef.capClone)
           model.attach(modelContext.current.partsRef.pistonClone)
           model.attach(modelContext.current.partsRef.springClone)
           modelContext.current.partsRef.capFeeder.visible = false
           modelContext.current.partsRef.pistonFeeder.visible = false
           modelContext.current.partsRef.springFeeder.visible = false
-          modelContext.current.runSimulation = false
-          modelContext.current.handlePartsMovement.fullSimulation().kill()
+
+          if(mode === "editor") {
+            controls.minDistance = 1
+          }
         }
 
         scene.add(model);
@@ -180,6 +185,7 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
     // Cleanup on unmount
     return () => {
       cancelAnimationFrame(rafId);
+      modelContext.current.runSimulation = false
       window.removeEventListener("resize", handleResize);
       controls.dispose();
       renderer.dispose();
@@ -198,6 +204,6 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
     };
   }, [modelPath, backgroundColor, enableShadows, mode]);
 
-  return<div ref={containerRef} style={{ width: "100%", height: "100%", minHeight: 400 }} /> 
+  return<div ref={containerRef} className="h-screen w-full min-h-[400px]" /> 
     
 }

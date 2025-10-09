@@ -3,18 +3,23 @@
 @theme{
     --color-red-primary: #bd4b64;
     --color-red-dark: #9c3a4f;
+    --color-red-disable: #70293a;
+    --color-red-light: #d68f9f;
     --color-black-primary: #1b1e23;
     --color-black-dark: hsl(206, 10%, 6%);
+    --color-black-fade: hsla(206, 10%, 0%, 0.1);
     --color-purple-primary: #9e2281;
     --color-peach-primary: #ec8d75;
     --color-peach-dark: #a66353;
     --color-green-primary: #96e6c2;
     --color-blue-primary: #50a9cf;
-    --color-cream-primary: hsla(40, 100%, 80%, 0.5);
+    --color-cream-primary: hsla(40, 100%, 80%);
+    --color-white-primary: #f6eddb;
 
     --padding-control: 3px 7px 9px 5px;
     
     --shadow-control: 0px 0px 8px 3px rgba(0,0,0,0.1) inset;
+    --shadow-bulb: 0px 0px 12px 1px #bd4b64;
 
     --font-iceland: "Iceland", sans-serif;
     --font-cascadia: "Cascadia Code", monospace;

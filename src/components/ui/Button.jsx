@@ -1,7 +1,7 @@
 import React from 'react'
 import clsx from 'clsx'
 
-const Button = ({variant="primary", size="md", children, armStatus, ...props}) => {
+const Button = ({variant="primary", size="md", children, armStatus, addClass="", ...props}) => {
 
     const isDisabled = armStatus == children
     const variantClasses = {
@@ -18,7 +18,7 @@ const Button = ({variant="primary", size="md", children, armStatus, ...props}) =
         lg: "px-32 py-5 text-lg tracking-widest",
     };
     return (
-        <button className={clsx(variantClasses[variant], sizeClasses[size], "cursor-pointer font-iceland ")} {...props} disabled={isDisabled}>
+        <button className={clsx(variantClasses[variant], sizeClasses[size], "cursor-pointer font-iceland ", addClass)} {...props} disabled={isDisabled}>
             {variant != "control" ? children : <div className='w-full h-full bg-green-primary flex justify-center items-center whitespace-nowrap py-2 px-3 rounded-xs shadow-control font-cascadia font-semibold'>
                 {children}
             </div>}

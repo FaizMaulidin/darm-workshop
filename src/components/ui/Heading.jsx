@@ -1,8 +1,15 @@
+import clsx from 'clsx'
 import React from 'react'
 
-const Heading = ({children}) => {
+const Heading = ({children, variant = "primary"}) => {
+
+  const variantClass = {
+    "primary": "text-green-primary justify-center",
+    "secondary": "text-red-primary font-iceland justify-start",
+  }
+  
   return (
-    <div className='text-4xl font-bold text-green-primary tracking-widest flex justify-center items-start w-full '>{children}</div>
+    <div className={clsx('text-4xl font-bold tracking-widest flex items-start w-full ', variantClass[variant])}>{children}</div>
   )
 }
 
