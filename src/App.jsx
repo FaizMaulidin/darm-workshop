@@ -7,6 +7,7 @@ import ModelProvider from './hooks/ModelProvider'
 import StatusProvider from './hooks/StatusProvider'
 import PLCeditor from './pages/PLCeditor'
 import LadderCellProvider from './hooks/LadderCellProvider'
+import LadderDataProvider from './hooks/LadderDataProvider'
 
 function App() {
 
@@ -15,13 +16,15 @@ function App() {
       <Navbar />
       <StatusProvider>
         <ModelProvider>
-          <LadderCellProvider>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/simulation" element={<SimulationPage/>} />
-              <Route path="/plc-editor" element={<PLCeditor/>} />
-            </Routes>
-          </LadderCellProvider>
+          <LadderDataProvider>
+            <LadderCellProvider>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/simulation" element={<SimulationPage/>} />
+                <Route path="/plc-editor" element={<PLCeditor/>} />
+              </Routes>
+            </LadderCellProvider>
+          </LadderDataProvider>
         </ModelProvider>
       </StatusProvider>
     </>

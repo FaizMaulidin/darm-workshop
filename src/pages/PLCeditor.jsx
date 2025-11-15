@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ModelViewer from '../components/layout/ModelViewer'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -9,10 +9,12 @@ import DraggableItem from '../components/ui/DraggableItem'
 import TBExpandable from '../components/layout/TBExpandable'
 import ToolBoxCell from '../components/ui/ToolBoxCell'
 import { useLadderCellContext } from '../hooks/LadderCellProvider'
+import RunSimulation from '../components/ui/RunSimulation'
 
 const PLCeditor = () => {
   const ladderCellContext = useLadderCellContext()
   const {contact, coil} = ladderCellContext.value
+  const [running, setRunning] = useState(false)
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -45,9 +47,9 @@ const PLCeditor = () => {
                   <div className='grid grid-cols-6 px-[1px] gap-x-[1px] grid-rows-[repeat(auto-fill,minmax(50px,1fr))] auto-rows-[minmax(50px,1fr)] flex-grow'>
                     {Array.from({length: 120}).map((_, index) => {
                       if(index % 6 === 5) {
-                        return <DnDCanvas key={index} type="coil"/>
+                        return <DnDCanvas key={index} running={running} index={index} type="coil"/>
                       }
-                      return <DnDCanvas key={index}/>
+                      return <DnDCanvas key={index} running={running} index={index}/>
                     })}
                   </div>
                 </div>
@@ -85,37 +87,37 @@ const PLCeditor = () => {
                       <ToolBoxCell color='black'>Notes</ToolBoxCell>
                       <ToolBoxCell>01</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.outputs.Q1}>Q1</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q1}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q1}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.outputs.RQ1}>R</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell justify='start'>Arm Position_Q2</ToolBoxCell>
+                      <ToolBoxCell justify='start'>Arm Movements_Q0</ToolBoxCell>
                       <ToolBoxCell>02</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.outputs.Q2}>Q2</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q2}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q2}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.outputs.RQ2}>R</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell justify='start'>Arm Position_Q1</ToolBoxCell>
+                      <ToolBoxCell justify='start'>Arm Movements_Q1</ToolBoxCell>
                       <ToolBoxCell>03</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.outputs.Q3}>Q3</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q3}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q3}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.outputs.RQ3}>R</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell justify='start'>Arm Position_Q0</ToolBoxCell>
+                      <ToolBoxCell justify='start'>Arm Movements_Q2</ToolBoxCell>
                       <ToolBoxCell>04</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.outputs.Q4}>Q4</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q4}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q4}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.outputs.RQ4}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell justify='start'>Gripper</ToolBoxCell>
                       <ToolBoxCell>05</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.outputs.Q5}>Q5</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q5}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q5}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.outputs.RQ5}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell justify='start'>Spring Mag Extend</ToolBoxCell>
                       <ToolBoxCell>06</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.outputs.Q6}>Q6</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q6}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q6}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.outputs.RQ6}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell justify='start'>Spring Mag Retract</ToolBoxCell>
                       <ToolBoxCell>07</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.outputs.Q7}>Q7</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q7}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.outputs.Q7}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.outputs.RQ7}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell justify='start'>Feed Cap</ToolBoxCell>
                     </TBExpandable>
@@ -126,57 +128,55 @@ const PLCeditor = () => {
                       <ToolBoxCell color='blue'></ToolBoxCell>
                       <ToolBoxCell>01</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.M1}>M1</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M1}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M1}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.RM1}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell>02</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.M2}>M2</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M2}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M2}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.RM2}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell>03</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.M3}>M3</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M3}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M3}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.RM3}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell>04</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.M4}>M4</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M4}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M4}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.RM4}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell>05</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.M5}>M5</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M5}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M5}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.RM5}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell>06</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.M6}>M6</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M6}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M6}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.RM6}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell>07</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.M7}>M7</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M7}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M7}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.RM7}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell>08</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.M8}>M8</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M8}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M8}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.RM8}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell>09</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.M9}>M9</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M9}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.M9}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.RM9}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell>10</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.MA}>MA</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.MA}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.MA}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.RMA}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell>11</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.MB}>MB</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.MB}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.MB}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.RMB}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell>12</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.MC}>MC</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.MC}>S</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.MC}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.RMC}>R</DraggableItem></ToolBoxCell>
                     </TBExpandable>
                   </div>
-                  <button className='bg-green-primary px-2 py-1 rounded-xs text-black-primary hover:text-red-primary transition-all duration-300 cursor-pointer'>
-                    Run Simulation
-                  </button>
+                  <RunSimulation running={running} setRunning={setRunning}/>
                 </div>
               </div>
             </div>

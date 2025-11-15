@@ -17,7 +17,6 @@ const SimulationPage = () => {
 
     const handleClick = async(e, movement) => {
         if(!modelContext?.current?.status?.busy) {
-            handlePartsMovement?.armPosition?.setStatus(e.target.innerHTML)
             await movement()
             setArmStatus(e.target.innerHTML)
         }
@@ -31,7 +30,7 @@ const SimulationPage = () => {
                 capPresent: false,
                 springPresent: false,
                 pistonPresent: true,
-                bodyPresent: false,
+                bodyPresent: true,
             }
         })
     }, [mode])
@@ -61,51 +60,52 @@ const SimulationPage = () => {
                         variant="control" 
                         size="control" 
                         onClick={(el) => handleClick(el, handlePartsMovement?.armPosition?.homePosition)} 
-                        armStatus={armStatus}
+                        // armStatus={armStatus}
                     >Home Position</Button>
                     <Button 
                         variant="control" 
                         size="control" 
                         onClick={(el) => handleClick(el, handlePartsMovement?.armPosition?.getBody)} 
-                        armStatus={armStatus}
+                        // armStatus={armStatus}
                     >Pick Body</Button>
                     <Button 
                         variant="control" 
                         size="control" 
                         onClick={(el) => handleClick(el, handlePartsMovement?.armPosition?.getPiston)} 
-                        armStatus={armStatus}
+                        // armStatus={armStatus}
                     >Pick Piston</Button>
                     <Button 
                         variant="control" 
                         size="control" 
                         onClick={(el) => handleClick(el, handlePartsMovement?.armPosition?.getSpring)}
-                        armStatus={armStatus}
+                        // armStatus={armStatus}
                     >Pick Spring</Button>
                     <Button 
                         variant="control" 
                         size="control" 
                         onClick={(el) => handleClick(el, handlePartsMovement?.armPosition?.getCap)}
-                        armStatus={armStatus}
+                        // armStatus={armStatus}
                     >Pick Cap</Button>
                 </SubPanel>
                 <SubPanel subHeading="Assembly Cycle">
                     <Button 
                         variant="control" 
                         size="control" 
-                        armStatus={armStatus}
+                        onClick={(el) => handleClick(el, handlePartsMovement?.armPosition?.assembleBody)} 
+                        // armStatus={armStatus}
                     >Assemble Body</Button>
                     <Button 
                         variant="control" 
                         size="control" 
-                        onClick={(el) => handleClick(el, handlePartsMovement?.armPosition?.assembleCap)} 
-                        armStatus={armStatus}
-                    >Assemble Cap</Button>
+                        onClick={(el) => handleClick(el, handlePartsMovement?.armPosition?.assemblePiston)} 
+                        // armStatus={armStatus}
+                    >Assemble Piston/Spring</Button>
                     <Button 
                         variant="control" 
                         size="control" 
-                        onClick={(el) => handleClick(el, handlePartsMovement?.armPosition?.assemblePiston)} 
-                        armStatus={armStatus}
-                    >Assemble Piston/Spring</Button>
+                        onClick={(el) => handleClick(el, handlePartsMovement?.armPosition?.assembleCap)} 
+                        // armStatus={armStatus}
+                    >Assemble Cap & Send Cylinder</Button>
                 </SubPanel>
             </ExpandablePanel>}
             <ExpandablePanel position="left" heading="STATUS PANEL">

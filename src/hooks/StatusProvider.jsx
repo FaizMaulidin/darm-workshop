@@ -8,9 +8,9 @@ const StatusProvider = ({children}) => {
             busy: false,
             gpOpened: false,
             capPresent: false,
-            springPresent: true,
-            pistonPresent: false,
-            bodyPresent: false,
+            springPresent: false,
+            pistonPresent: true,
+            bodyPresent: true,
         },
     })
     

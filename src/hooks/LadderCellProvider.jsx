@@ -11,7 +11,6 @@ const LadderCellProvider = ({children}) => {
                     name: "I1",
                     state: false,
                     categ: "inputs",
-                    NOpened: true,
                     notes: "Arm Busy"
                 },
                 I2: {
@@ -19,7 +18,6 @@ const LadderCellProvider = ({children}) => {
                     name: "I2",
                     state: false,
                     categ: "inputs",
-                    NOpened: true,
                     notes: "Gripper Opened"
                 },
                 I3: {
@@ -27,7 +25,6 @@ const LadderCellProvider = ({children}) => {
                     name: "I3",
                     state: false,
                     categ: "inputs",
-                    NOpened: true,
                     notes: "Body Present"
                 },
                 I4: {
@@ -35,7 +32,6 @@ const LadderCellProvider = ({children}) => {
                     name: "I4",
                     state: false,
                     categ: "inputs",
-                    NOpened: true,
                     notes: "Piston Present"
                 },
                 I5: {
@@ -43,7 +39,6 @@ const LadderCellProvider = ({children}) => {
                     name: "I5",
                     state: false,
                     categ: "inputs",
-                    NOpened: true,
                     notes: "Spring Present"
                 },
                 I6: {
@@ -51,7 +46,6 @@ const LadderCellProvider = ({children}) => {
                     name: "I6",
                     state: false,
                     categ: "inputs",
-                    NOpened: true,
                     notes: "Cap Present"
                 },
             },
@@ -61,31 +55,27 @@ const LadderCellProvider = ({children}) => {
                     name: "Q1",
                     state: false,
                     categ: "outputs",
-                    NOpened: true,
-                    notes: "Arm Position_Q2"
+                    notes: "Arm Movements_Q0"
                 },
                 Q2: {
                     type: "contact",
                     name: "Q2",
                     state: false,
                     categ: "outputs",
-                    NOpened: true,
-                    notes: "Arm Position_Q1"
+                    notes: "Arm Movements_Q1"
                 },
                 Q3: {
                     type: "contact",
                     name: "Q3",
                     state: false,
                     categ: "outputs",
-                    NOpened: true,
-                    notes: "Arm Position_Q0"
+                    notes: "Arm Movements_Q2"
                 },
                 Q4: {
                     type: "contact",
                     name: "Q4",
                     state: false,
                     categ: "outputs",
-                    NOpened: true,
                     notes: "Gripper"
                 },
                 Q5: {
@@ -93,7 +83,6 @@ const LadderCellProvider = ({children}) => {
                     name: "Q5",
                     state: false,
                     categ: "outputs",
-                    NOpened: true,
                     notes: "Spring Mag Extend"
                 },
                 Q6: {
@@ -101,7 +90,6 @@ const LadderCellProvider = ({children}) => {
                     name: "Q6",
                     state: false,
                     categ: "outputs",
-                    NOpened: true,
                     notes: "Spring Mag Retract"
                 },
                 Q7: {
@@ -109,7 +97,6 @@ const LadderCellProvider = ({children}) => {
                     name: "Q7",
                     state: false,
                     categ: "outputs",
-                    NOpened: true,
                     notes: "Feed Cap"
                 },
             },
@@ -119,84 +106,72 @@ const LadderCellProvider = ({children}) => {
                     name: "M1",
                     state: false,
                     categ: "memory",
-                    NOpened: true,
                 },
                 M2: {
                     type: "contact",
                     name: "M2",
                     state: false,
                     categ: "memory",
-                    NOpened: true,
                 },
                 M3: {
                     type: "contact",
                     name: "M3",
                     state: false,
                     categ: "memory",
-                    NOpened: true,
                 },
                 M4: {
                     type: "contact",
                     name: "M4",
                     state: false,
                     categ: "memory",
-                    NOpened: true,
                 },
                 M5: {
                     type: "contact",
                     name: "M5",
                     state: false,
                     categ: "memory",
-                    NOpened: true,
                 },
                 M6: {
                     type: "contact",
                     name: "M6",
                     state: false,
                     categ: "memory",
-                    NOpened: true,
                 },
                 M7: {
                     type: "contact",
                     name: "M7",
                     state: false,
                     categ: "memory",
-                    NOpened: true,
                 },
                 M8: {
                     type: "contact",
                     name: "M8",
                     state: false,
                     categ: "memory",
-                    NOpened: true,
                 },
                 M9: {
                     type: "contact",
                     name: "M9",
                     state: false,
                     categ: "memory",
-                    NOpened: true,
                 },
                 MA: {
                     type: "contact",
                     name: "MA",
                     state: false,
                     categ: "memory",
-                    NOpened: true,
                 },
                 MB: {
                     type: "contact",
                     name: "MB",
                     state: false,
                     categ: "memory",
-                    NOpened: true,
                 },
                 MC: {
                     type: "contact",
                     name: "MC",
                     state: false,
                     categ: "memory",
-                    NOpened: true,
                 },
             }
         },

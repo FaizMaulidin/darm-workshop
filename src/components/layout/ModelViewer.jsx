@@ -134,8 +134,10 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
         
         if(mode === "simulation") {
           modelContext.current.runSimulation = true
+          modelContext.current.status.armStatus = ""
           modelContext.current.handlePartsMovement.fullSimulation()
         } else {
+          modelContext.current.status.armStatus = "homePosition"
           modelContext.current.runSimulation = false
           modelContext.current.status.busy = false
           modelContext.current.status.gpOpened = false
@@ -145,6 +147,7 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
           modelContext.current.partsRef.capFeeder.visible = false
           modelContext.current.partsRef.pistonFeeder.visible = false
           modelContext.current.partsRef.springFeeder.visible = false
+          modelContext.current.partsRef.bodyFeeder.visible = false
 
           if(mode === "editor") {
             controls.minDistance = 1

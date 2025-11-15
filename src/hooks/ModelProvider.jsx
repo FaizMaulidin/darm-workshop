@@ -1,4 +1,4 @@
-import React, { useRef, createContext, useContext, useState} from 'react'
+import React, { useRef, createContext, useContext, useState, useEffect} from 'react'
 import gsap from 'gsap'
 import * as THREE from 'three'
 import {useStatusContext} from "./StatusProvider"
@@ -7,13 +7,13 @@ const ModelContext = createContext()
 
 const ModelProvider = ({children}) => {
     const statusContext = useStatusContext()
-    const [armPositionStatus, setArmPositionStatus] = useState("Home Position")
 
     const value = useRef({
         runSimulation: true,
         status: {
             busy: false,
             gpOpened: false,
+            armStatus: ""
         },
         partsRef: {
             model: null,
@@ -38,22 +38,62 @@ const ModelProvider = ({children}) => {
             createClone: null,
         },
         handlePartsMovement: {
-            openGripper: () => {
+            openGripper: (lastStep=false) => {
                 if(value.current.status.gpOpened) return
                 const tl = gsap.timeline({onComplete: () => {
-                    value.current.status.gpOpened = true
                     statusContext.setValue((prev) => ({status: {...prev.status, gpOpened: true}}))
+                    if(!lastStep){
+                        value.current.partsRef.model.attach(value.current.partsRef.bodyClone)
+                        value.current.partsRef.model.attach(value.current.partsRef.pistonClone)
+                        value.current.partsRef.model.attach(value.current.partsRef.springClone)
+                        value.current.partsRef.model.attach(value.current.partsRef.capClone)
+                    }
+                }, 
+                onStart: () => {
+                    value.current.status.gpOpened = true
                 }})
                 tl
                     .to(value.current.partsRef.gpRight.position, {z: "-=0.005", duration: 0.2})
                     .to(value.current.partsRef.gpLeft.position, {z: "+=0.005", duration: 0.2}, "<")
                 return tl
             },
-            closeGripper: () => {
+            closeGripper: (editor=false) => {
                 if(!value.current.status.gpOpened) return
                 const tl = gsap.timeline({onComplete: () => {
                     value.current.status.gpOpened = false
                     statusContext.setValue((prev) => ({status: {...prev.status, gpOpened: false}}))
+
+                    const position = {
+                        posGripper: new THREE.Vector3(),
+                        posBody: new THREE.Vector3(),
+                        posPiston: new THREE.Vector3(),
+                        posSpring: new THREE.Vector3(),
+                        posCap: new THREE.Vector3()
+                    }
+
+                    value.current.partsRef.gripperPivot.getWorldPosition(position.posGripper)
+                    value.current.partsRef.bodyClone.getWorldPosition(position.posBody)
+                    value.current.partsRef.pistonClone.getWorldPosition(position.posPiston)
+                    value.current.partsRef.springClone.getWorldPosition(position.posSpring)
+                    value.current.partsRef.capClone.getWorldPosition(position.posCap)
+                    
+                    if(editor){
+                        if(position.posGripper.distanceTo(position.posBody) < 0.14){
+                            value.current.partsRef.gripperPivot.attach(value.current.partsRef.bodyClone)
+                        }
+                        if(position.posGripper.distanceTo(position.posPiston) < 0.13){
+                            value.current.partsRef.gripperPivot.attach(value.current.partsRef.pistonClone)
+                        }
+                        if(position.posGripper.distanceTo(position.posSpring) < 0.135){
+                            value.current.partsRef.gripperPivot.attach(value.current.partsRef.springClone)
+                        }
+                        if(position.posGripper.distanceTo(position.posCap) < 0.135){
+                            value.current.partsRef.gripperPivot.attach(value.current.partsRef.capClone)
+                        }
+                    }
+                }, 
+                onStart: () => {
+                    value.current.status.gpOpened = false
                 }})
                 tl
                     .to(value.current.partsRef.gpRight.position, {z: "+=0.005", duration: 0.2})
@@ -80,9 +120,9 @@ const ModelProvider = ({children}) => {
             },
             feedSpring: (explore=false) => {
                 value.current.status.busy = true
+                value.current.partsRef.fsExtended = true
                 const tl = gsap.timeline({onComplete: () => {
                     value.current.status.busy = false
-                    value.current.partsRef.fsExtended = true
                     statusContext.setValue((prev) => ({status: {...prev.status, springPresent: true}}))
                 }})
                 tl
@@ -96,9 +136,9 @@ const ModelProvider = ({children}) => {
             },
             unfeedSpring: (explore=false) => {
                 value.current.status.busy = true
+                value.current.partsRef.fsExtended = false
                 const tl = gsap.timeline({onComplete: () => {
                     value.current.status.busy = false
-                    value.current.partsRef.fsExtended = false
                 }, onStart: () => {
                     statusContext.setValue((prev) => ({status: {...prev.status, springPresent: false}}))
                 }})
@@ -112,13 +152,13 @@ const ModelProvider = ({children}) => {
                 return tl
             },
             armPosition: {
-                status: armPositionStatus,
-                setStatus: (status) => setArmPositionStatus(status),
-                homePosition: () => {
+                homePosition: (insideTl=false, reset=false) => {
+                    if(value.current.status.armStatus === "homePosition" && !reset) return
                     value.current.status.busy = true
                     const tl = gsap.timeline({onComplete: () => {
-                        value.current.status.busy = false
-                        statusContext.setValue((prev) => ({status: {...prev.status, busy: false}}))
+                        insideTl ? null : value.current.status.busy = false
+                        statusContext.setValue((prev) => ({status: {...prev.status, busy: insideTl ? true : false}}))
+                        value.current.status.armStatus = "homePosition"
                     }, onStart: () => {
                         statusContext.setValue((prev) => ({status: {...prev.status, busy: true}}))
                     }})
@@ -127,14 +167,35 @@ const ModelProvider = ({children}) => {
                         .to(value.current.partsRef.shoulderPivot.rotation, {z: 0, duration: 2}, "<")
                         .to(value.current.partsRef.elbowPivot.rotation, {z: 0, duration: 2}, "<")
                         .to(value.current.partsRef.wristPivot.rotation, {z: 0, duration: 2}, "<")
-                        .to(value.current.partsRef.gripperPivot.rotation, {y: 0, duration: 2}, "<")
+                        .to(value.current.partsRef.gripperPivot.rotation, {y: 0, duration: 1.5, delay:0.5}, "<")
                     return tl
                 },
-                getPiston: () => {
+                getBody: () => {
+                    if(value.current.status.armStatus === "getBody") return
                     value.current.status.busy = true
                     const tl = gsap.timeline({onComplete: () => {
                         value.current.status.busy = false
                         statusContext.setValue((prev) => ({status: {...prev.status, busy: false}}))
+                        value.current.status.armStatus = "getBody"
+                    }, onStart: () => {
+                        statusContext.setValue((prev) => ({status: {...prev.status, busy: true}}))
+                    }})
+                    tl
+                        .add(() => value.current.partsRef.bodyFeeder.visible = false)
+                        .to(value.current.partsRef.basePivot.rotation, {y: 0.1, duration: 2})
+                        .to(value.current.partsRef.shoulderPivot.rotation, {z: 0.98, duration: 2}, "<")
+                        .to(value.current.partsRef.elbowPivot.rotation, {z: -0.26, duration: 2}, "<")
+                        .to(value.current.partsRef.wristPivot.rotation, {z: -0.72, duration: 2}, "<")
+                        .to(value.current.partsRef.gripperPivot.rotation, {y: 0.78, duration: 2}, "<")
+                    return tl
+                },
+                getPiston: () => {
+                    if(value.current.status.armStatus === "getPiston") return
+                    value.current.status.busy = true
+                    const tl = gsap.timeline({onComplete: () => {
+                        value.current.status.busy = false
+                        statusContext.setValue((prev) => ({status: {...prev.status, busy: false}}))
+                        value.current.status.armStatus = "getPiston"
                     }, onStart: () => {
                         statusContext.setValue((prev) => ({status: {...prev.status, busy: true}}))
                     }})
@@ -148,10 +209,12 @@ const ModelProvider = ({children}) => {
                     return tl
                 },
                 getSpring: () => {
+                    if(value.current.status.armStatus === "getSpring") return
                     value.current.status.busy = true
                     const tl = gsap.timeline({onComplete: () => {
                         value.current.status.busy = false
                         statusContext.setValue((prev) => ({status: {...prev.status, busy: false}}))
+                        value.current.status.armStatus = "getSpring"
                     }, onStart: () => {
                         statusContext.setValue((prev) => ({status: {...prev.status, busy: true}}))
                     }})
@@ -164,10 +227,12 @@ const ModelProvider = ({children}) => {
                     return tl
                 },
                 getCap: () => {
+                    if(value.current.status.armStatus === "getCap") return
                     value.current.status.busy = true
                     const tl = gsap.timeline({onComplete: () => {
                         value.current.status.busy = false
                         statusContext.setValue((prev) => ({status: {...prev.status, busy: false}}))
+                        value.current.status.armStatus = "getCap"
                     }, onStart: () => {
                         statusContext.setValue((prev) => ({status: {...prev.status, busy: true}}))
                     }})
@@ -179,12 +244,63 @@ const ModelProvider = ({children}) => {
                         .to(value.current.partsRef.gripperPivot.rotation, {y: -2.25, duration: 2}, "<")
                     return tl
                 },
-                assemblePiston: () => {
+                assembleBody: (editor=false) => {
+                    if(value.current.status.armStatus === "assembleBody") return
                     value.current.status.busy = true
                     const tl = gsap.timeline({onComplete: () => {
                         value.current.status.busy = false
                         statusContext.setValue((prev) => ({status: {...prev.status, busy: false}}))
                     }, onStart: () => {
+                        value.current.status.armStatus = "assembleBody"
+                        statusContext.setValue((prev) => ({status: {...prev.status, busy: true}}))
+                    }})
+                    tl
+                        .to(value.current.partsRef.basePivot.rotation, {y: 0.105, duration: 2})
+                        .to(value.current.partsRef.shoulderPivot.rotation, {z: 1.18, duration: 2}, "<")
+                        .to(value.current.partsRef.elbowPivot.rotation, {z: -0.59, duration: 2}, "<")
+                        .to(value.current.partsRef.wristPivot.rotation, {z: -0.59, duration: 2}, "<")
+                        .to(value.current.partsRef.gripperPivot.rotation, {y: 3.02, duration: 2}, "<")
+                        .add(() => value.current.handlePartsMovement.openGripper())
+                        .add(() => {
+                            if(!value.current.runSimulation) return
+                            value.current.partsRef.model.attach(value.current.partsRef.bodyClone)
+                        }, "<")
+                        .add(() => {
+                            if(!value.current.runSimulation && !editor) return
+                            gsap.to(value.current.partsRef.bodyClone.position, {y: "-=0.006", duration: 0.1})
+                        }, "<")
+                        .to({}, {duration: 0.5})
+                        .to(value.current.partsRef.shoulderPivot.rotation, {z: 1, duration: 0.8})
+                        .to(value.current.partsRef.elbowPivot.rotation, {z: -0.7, duration: 0.8}, "<")
+                        .to(value.current.partsRef.wristPivot.rotation, {z: -0.3, duration: 0.8}, "<")
+                        .to(value.current.partsRef.basePivot.rotation, {y: 0.09, duration: 2})
+                        .to(value.current.partsRef.shoulderPivot.rotation, {z: 1.43, duration: 2}, "<")
+                        .to(value.current.partsRef.elbowPivot.rotation, {z: -0.96, duration: 2}, "<")
+                        .to(value.current.partsRef.wristPivot.rotation, {z: -0.47, duration: 2}, "<")
+                        .to(value.current.partsRef.gripperPivot.rotation, {y: 0, duration: 2}, "<")
+                        .add(() => value.current.handlePartsMovement.closeGripper())
+                        .add(() => {
+                            if(!value.current.runSimulation && !editor) return
+                            value.current.partsRef.gripperPivot.attach(value.current.partsRef.bodyClone)
+                        }, "<")
+                        .to({}, {duration: 0.5})
+                        .to(value.current.partsRef.shoulderPivot.rotation, {z: 1.45, duration: 0.8})
+                        .to(value.current.partsRef.elbowPivot.rotation, {z: -1.2, duration: 0.8}, "<")
+                        .to(value.current.partsRef.wristPivot.rotation, {z: -0.25, duration: 0.8}, "<")
+                        .to(value.current.partsRef.basePivot.rotation, {y: 0.082, duration: 0.8, delay: 0.2})
+                        .to(value.current.partsRef.shoulderPivot.rotation, {z: 1.745, duration: 0.8}, "<")
+                        .to(value.current.partsRef.elbowPivot.rotation, {z: -1.455, duration: 0.8}, "<")
+                        .to(value.current.partsRef.wristPivot.rotation, {z: -0.29, duration: 0.8}, "<")
+                    return tl
+                },
+                assemblePiston: () => {
+                    if(value.current.status.armStatus === "assemblePiston") return
+                    value.current.status.busy = true
+                    const tl = gsap.timeline({onComplete: () => {
+                        value.current.status.busy = false
+                        statusContext.setValue((prev) => ({status: {...prev.status, busy: false}}))
+                    }, onStart: () => {
+                        value.current.status.armStatus = "assemblePiston"
                         statusContext.setValue((prev) => ({status: {...prev.status, busy: true}}))
                     }})
                     tl
@@ -196,11 +312,13 @@ const ModelProvider = ({children}) => {
                     return tl
                 },
                 assembleCap: () => {
+                    if(value.current.status.armStatus === "assembleCap") return
                     value.current.status.busy = true
                     const tl = gsap.timeline({onComplete: () => {
                         value.current.status.busy = false
                         statusContext.setValue((prev) => ({status: {...prev.status, busy: false}}))
                     }, onStart: () => {
+                        value.current.status.armStatus = "assembleCap"
                         statusContext.setValue((prev) => ({status: {...prev.status, busy: true}}))
                     }})
                     tl
@@ -222,7 +340,7 @@ const ModelProvider = ({children}) => {
                         .to(value.current.partsRef.shoulderPivot.rotation, {z: 0.905, duration: 1})
                         .to(value.current.partsRef.wristPivot.rotation, {z: -0.505, duration: 1}, "<")
                         .to(value.current.partsRef.gripperPivot.rotation, {y: 1.4, duration: 1})
-                        .to(value.current.partsRef.basePivot.rotation, {y: 0.145, duration: 2}, "<")
+                        .to(value.current.partsRef.basePivot.rotation, {y: 0.143, duration: 2}, "<")
                         .to(value.current.partsRef.shoulderPivot.rotation, {z: 1.32, duration: 2}, "<")
                         .to(value.current.partsRef.elbowPivot.rotation, {z: -0.77, duration: 2}, "<")
                         .to(value.current.partsRef.wristPivot.rotation, {z: -0.55, duration: 2}, "<")
@@ -246,31 +364,76 @@ const ModelProvider = ({children}) => {
                             gsap.to(value.current.partsRef.springClone.position, {y: "-=0.002", duration: 2})
                         }, "<")
                         .to(value.current.partsRef.gripperPivot.rotation, {y: 1.2, duration: 0.5})
+                        .add(() => value.current.handlePartsMovement.openGripper())
+                        .add(() => value.current.partsRef.model.attach(value.current.partsRef.capClone), "<")
+                        .to({}, {duration: 0.5})
+                        .to(value.current.partsRef.shoulderPivot.rotation, {z: 1.5, duration: 1}, "<")
+                        .to(value.current.partsRef.elbowPivot.rotation, {z: -1.25, duration: 1}, "<")
+                        .to(value.current.partsRef.gripperPivot.rotation, {y: 3.145, duration: 0.7, delay: 0.3}, "<")
+                        .add(value.current.handlePartsMovement.armPosition.sendCylinder())
                     return tl
-                }
+                },
+                sendCylinder: () => {
+                    value.current.status.busy = true
+                    const tl = gsap.timeline({onComplete: () => {
+                        value.current.status.busy = false
+                        statusContext.setValue((prev) => ({status: {...prev.status, busy: false}}))
+                    }, onStart: () => {
+                        statusContext.setValue((prev) => ({status: {...prev.status, busy: true}}))
+                    }})
+                    tl
+                        .add(() => value.current.handlePartsMovement.openGripper())
+                        .to(value.current.partsRef.basePivot.rotation, {y: 0.08, duration: 2, delay: 0.2})
+                        .to(value.current.partsRef.shoulderPivot.rotation, {z: 1.42, duration: 2}, "<")
+                        .to(value.current.partsRef.elbowPivot.rotation, {z: -0.94, duration: 2}, "<")
+                        .to(value.current.partsRef.wristPivot.rotation, {z: -0.48, duration: 2}, "<")
+                        .to(value.current.partsRef.gripperPivot.rotation, {y: 3.145, duration: 2}, "<")
+                        .add(() => value.current.handlePartsMovement.closeGripper())
+                        .add(() => {
+                            if(!value.current.runSimulation) return
+                            value.current.partsRef.gripperPivot.attach(value.current.partsRef.pistonClone)
+                            value.current.partsRef.gripperPivot.attach(value.current.partsRef.springClone)
+                            value.current.partsRef.gripperPivot.attach(value.current.partsRef.capClone)
+                            value.current.partsRef.gripperPivot.attach(value.current.partsRef.bodyClone)
+                        })
+                        .to({}, {duration: 0.5})
+                        .add(value.current.handlePartsMovement.armPosition.homePosition(true))
+                        .to(value.current.partsRef.basePivot.rotation, {y: 1.502, duration: 2})
+                        .to(value.current.partsRef.shoulderPivot.rotation, {z: 0.47, duration: 3}, "<")
+                        .to(value.current.partsRef.elbowPivot.rotation, {z: 0.15, duration: 2}, "<")
+                        .to(value.current.partsRef.wristPivot.rotation, {z: -0.62, duration: 2}, "<")
+                        .to(value.current.partsRef.gripperPivot.rotation, {y: 3.19, duration: 2}, "<")
+                        .add(() => value.current.handlePartsMovement.openGripper(true))
+                        .add(() => {
+                            if(!value.current.runSimulation) return
+                            value.current.partsRef.model.attach(value.current.partsRef.bodyClone)
+                            value.current.partsRef.bodyClone.attach(value.current.partsRef.pistonClone)
+                            value.current.partsRef.bodyClone.attach(value.current.partsRef.springClone)
+                            value.current.partsRef.bodyClone.attach(value.current.partsRef.capClone)
+                        })
+                        .add(() => {
+                            if(!value.current.runSimulation) return
+                            const tlInside = gsap.timeline({
+                                onComplete: () => {
+                                    value.current.partsRef.model.attach(value.current.partsRef.pistonClone)
+                                    value.current.partsRef.model.attach(value.current.partsRef.springClone)
+                                    value.current.partsRef.model.attach(value.current.partsRef.capClone)
+                                }
+                            })
+                            tlInside
+                                .to(value.current.partsRef.bodyClone.position, {y: "-=0.003", duration: 0.1})
+                                .to(value.current.partsRef.bodyClone.position, {y: "-=0.007", duration: 0.1})
+                                .to(value.current.partsRef.bodyClone.rotation, {x: "+=0.3", duration: 0.1}, "<")
+                                .to(value.current.partsRef.bodyClone.position, {z: "+=0.133", y: "-=0.035", duration: 1})
+                        })
+                        .to({}, {duration: 0.5})
+
+                    return tl
+                },
             },
             fullSimulation: () => {
                 const tl = gsap.timeline({onComplete: () => value.current.status.busy = false, repeat: -1, onRepeat: () => {
-                    value.current.partsRef.springFeeder.visible = true
-                    value.current.partsRef.capFeeder.visible = true
-                    value.current.partsRef.pistonFeeder.visible = true
-
-                    value.current.partsRef.model.remove(value.current.partsRef.pistonClone)
-                    value.current.partsRef.model.remove(value.current.partsRef.springClone)
-                    value.current.partsRef.model.remove(value.current.partsRef.capClone)
-
-                    value.current.partsRef.createClone()
-
-                    statusContext.setValue({
-                        status: {
-                            busy: false,
-                            gpOpened: false,
-                            capPresent: false,
-                            springPresent: false,
-                            pistonPresent: true,
-                            bodyPresent: false,
-                        }
-                    })
+                    value.current.handlePartsMovement.resetStation()
                 }, onUpdate: () => {
                     if(!value.current.runSimulation) tl.kill()
                 }})
@@ -278,6 +441,17 @@ const ModelProvider = ({children}) => {
                 tl
                     .to({}, {duration: 1})
                     .add(() => value.current.handlePartsMovement.openGripper())
+                    .add(value.current.handlePartsMovement.armPosition.getBody())
+                    .add(() => value.current.partsRef.gripperPivot.attach(value.current.partsRef.bodyClone))
+                    .add(() => value.current.handlePartsMovement.closeGripper())
+                    .to({}, {duration: 0.5})
+                    .add(() => statusContext.setValue((prev) => ({status: {...prev.status, bodyPresent: false}})))
+                    .add(value.current.handlePartsMovement.armPosition.homePosition())
+                    .add(value.current.handlePartsMovement.armPosition.assembleBody())
+                    .add(() => value.current.handlePartsMovement.openGripper())
+                    .add(() => value.current.partsRef.model.attach(value.current.partsRef.bodyClone), "<")
+                    .to({}, {duration: 0.5})
+                    .add(value.current.handlePartsMovement.armPosition.homePosition())
                     .add(value.current.handlePartsMovement.armPosition.getPiston())
                     .add(() => value.current.partsRef.gripperPivot.attach(value.current.partsRef.pistonClone))
                     .add(() => value.current.handlePartsMovement.closeGripper())
@@ -315,13 +489,39 @@ const ModelProvider = ({children}) => {
                     .add(() => statusContext.setValue((prev) => ({status: {...prev.status, capPresent: false}})))
                     .add(value.current.handlePartsMovement.armPosition.homePosition())
                     .add(value.current.handlePartsMovement.armPosition.assembleCap())
-                    .add(() => value.current.handlePartsMovement.openGripper())
-                    .add(() => value.current.partsRef.model.attach(value.current.partsRef.capClone), "<")
-                    .to({}, {duration: 0.5})
+                    
                     .add(value.current.handlePartsMovement.armPosition.homePosition())
                     .add(() => value.current.handlePartsMovement.closeGripper())
                     .to({}, {duration: 0.5})
                 return tl
+            },
+            resetStation: () => {
+                value.current.partsRef.springFeeder.visible = true
+                value.current.partsRef.capFeeder.visible = true
+                value.current.partsRef.pistonFeeder.visible = true
+                value.current.partsRef.bodyFeeder.visible = true
+
+                value.current.partsRef.model.remove(value.current.partsRef.pistonClone)
+                value.current.partsRef.model.remove(value.current.partsRef.springClone)
+                value.current.partsRef.model.remove(value.current.partsRef.capClone)
+                value.current.partsRef.model.remove(value.current.partsRef.bodyClone)
+                value.current.partsRef.gripperPivot.remove(value.current.partsRef.pistonClone)
+                value.current.partsRef.gripperPivot.remove(value.current.partsRef.springClone)
+                value.current.partsRef.gripperPivot.remove(value.current.partsRef.capClone)
+                value.current.partsRef.gripperPivot.remove(value.current.partsRef.bodyClone)
+
+                value.current.partsRef.createClone()
+
+                statusContext.setValue({
+                    status: {
+                        busy: false,
+                        gpOpened: false,
+                        capPresent: false,
+                        springPresent: false,
+                        pistonPresent: true,
+                        bodyPresent: true,
+                    }
+                })
             }
         }
     })
