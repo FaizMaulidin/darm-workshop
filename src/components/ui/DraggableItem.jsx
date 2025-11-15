@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import React from 'react'
 import { useDrag } from 'react-dnd'
 
-const DraggableItem = ({children, ladderCell, itemName}) => {
+const DraggableItem = ({children, ladderCell}) => {
     const [{ isDragging }, drag] = useDrag({
         type: ladderCell.type,
         item: ladderCell,

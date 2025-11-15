@@ -260,14 +260,18 @@ const ModelProvider = ({children}) => {
                         .to(value.current.partsRef.elbowPivot.rotation, {z: -0.59, duration: 2}, "<")
                         .to(value.current.partsRef.wristPivot.rotation, {z: -0.59, duration: 2}, "<")
                         .to(value.current.partsRef.gripperPivot.rotation, {y: 3.02, duration: 2}, "<")
-                        .add(() => value.current.handlePartsMovement.openGripper())
+                        .add(() => {value.current.handlePartsMovement.openGripper()})
                         .add(() => {
                             if(!value.current.runSimulation) return
                             value.current.partsRef.model.attach(value.current.partsRef.bodyClone)
                         }, "<")
                         .add(() => {
                             if(!value.current.runSimulation && !editor) return
-                            gsap.to(value.current.partsRef.bodyClone.position, {y: "-=0.006", duration: 0.1})
+                            if(editor){
+                                gsap.to(value.current.partsRef.bodyClone.position, {y: "-=0.004", duration: 0.1})
+                            } else {
+                                gsap.to(value.current.partsRef.bodyClone.position, {y: "-=0.006", duration: 0.1})
+                            }
                         }, "<")
                         .to({}, {duration: 0.5})
                         .to(value.current.partsRef.shoulderPivot.rotation, {z: 1, duration: 0.8})

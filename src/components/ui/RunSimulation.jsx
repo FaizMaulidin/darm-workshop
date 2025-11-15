@@ -140,20 +140,19 @@ const RunSimulation = ({running, setRunning}) => {
                     }
                 }))
                 const cond = JSON.stringify(oldHorizontal) === JSON.stringify(ladderDataHorizontal.current)
-                // const oldArm = {
-                //     Q1: oldHorizontal.find(item => item?.name === "Q1" && item?.type === "coil")?.state,
-                //     Q2: oldHorizontal.find(item => item?.name === "Q2" && item?.type === "coil")?.state,
-                //     Q3: oldHorizontal.find(item => item?.name === "Q3" && item?.type === "coil")?.state,
-                // }
-                // const newArm = {
-                //     Q1: ladderDataHorizontal.current.find(item => item?.name === "Q1" && item?.type === "coil")?.state,
-                //     Q2: ladderDataHorizontal.current.find(item => item?.name === "Q2" && item?.type === "coil")?.state,
-                //     Q3: ladderDataHorizontal.current.find(item => item?.name === "Q3" && item?.type === "coil")?.state,
-                // }
-                // if(JSON.stringify(oldArm) !== JSON.stringify(newArm)){
-                //     statusRef.current.busy = true
-                //     simulation()
-                // }
+                const oldArm = {
+                    Q1: oldHorizontal.find(item => item?.name === "Q1" && item?.type === "coil")?.state,
+                    Q2: oldHorizontal.find(item => item?.name === "Q2" && item?.type === "coil")?.state,
+                    Q3: oldHorizontal.find(item => item?.name === "Q3" && item?.type === "coil")?.state,
+                }
+                const newArm = {
+                    Q1: ladderDataHorizontal.current.find(item => item?.name === "Q1" && item?.type === "coil")?.state,
+                    Q2: ladderDataHorizontal.current.find(item => item?.name === "Q2" && item?.type === "coil")?.state,
+                    Q3: ladderDataHorizontal.current.find(item => item?.name === "Q3" && item?.type === "coil")?.state,
+                }
+                if(JSON.stringify(oldArm) !== JSON.stringify(newArm)){
+                    simulation()
+                }
                 if(!cond){
                     setMergedArray(mergeHV(ladderDataHorizontal.current, ladderData.value.vertical))
                 }

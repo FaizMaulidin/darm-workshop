@@ -8,10 +8,28 @@ import StatusProvider from './hooks/StatusProvider'
 import PLCeditor from './pages/PLCeditor'
 import LadderCellProvider from './hooks/LadderCellProvider'
 import LadderDataProvider from './hooks/LadderDataProvider'
+import { useState, useEffect } from 'react'
+
+function useMinWidth(breakpoint = 1200) {
+  const [isWide, setIsWide] = useState(window.innerWidth >= breakpoint);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsWide(window.innerWidth >= breakpoint);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [breakpoint]);
+
+  return isWide;
+}
 
 function App() {
 
-  return (
+  const isWideEnough = useMinWidth(1024);
+
+  return isWideEnough ? (
     <>
       <Navbar />
       <StatusProvider>
@@ -28,6 +46,11 @@ function App() {
         </ModelProvider>
       </StatusProvider>
     </>
+  ) : (
+    <div className='w-full h-[100vh] flex justify-center items-center bg-black-primary text-red-primary'>
+      <p className='text-lg font-cascadia text-center w-3/4'>This app is only available on desktop screens (≥1024px).  
+        <br/>Please use a wider screen to continue.</p>
+    </div>
   )
 }
 
