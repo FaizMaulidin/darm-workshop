@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://darm-workshop.vercel.app/sitemap.xml
