@@ -11,8 +11,10 @@ import ToolBoxCell from '../components/ui/ToolBoxCell'
 import { useLadderCellContext } from '../hooks/LadderCellProvider'
 import RunSimulation from '../components/ui/RunSimulation'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFileArrowUp, faDownload } from '@fortawesome/free-solid-svg-icons'
+import { faFileArrowUp, faDownload, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { useLadderDataContext } from '../hooks/LadderDataProvider'
+import clsx from 'clsx'
+import Button from '../components/ui/Button'
 
 const PLCeditor = () => {
   const ladderCellContext = useLadderCellContext()
@@ -20,6 +22,7 @@ const PLCeditor = () => {
   const [running, setRunning] = useState(false)
   const ladderDataContext = useLadderDataContext()
   const fileInputRef = useRef(null)
+  const [showModal, setShowModal] = useState(false)
 
   function exportLadder(ladder) {
     const blob = new Blob([JSON.stringify(ladder, null, 2)], {
@@ -59,7 +62,19 @@ const PLCeditor = () => {
     fileInputRef.current.value = ""
   }, [ladderDataContext.value])
 
-  
+  const resetLadder = () => {
+    const horizontal = ladderDataContext.value.horizontal.map(item => {
+      if(item) return null
+      return item
+    })
+    const vertical = ladderDataContext.value.vertical.map(item => {
+      if(item) return null
+      return item
+    })
+    ladderDataContext.setValue({horizontal, vertical})
+    localStorage.setItem("ladderData", JSON.stringify({horizontal, vertical}));
+    setShowModal(false)
+  }
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -71,8 +86,9 @@ const PLCeditor = () => {
               <div className='flex items-center justify-between'>
                 <Heading variant="secondary">PLC LADDER EDITOR</Heading>
                 <div className='flex gap-2 text-xl text-cream-primary'>
-                  <button onClick={() => fileInputRef.current.click()} className='bg-red-primary px-3 py-1 rounded-sm hover:cursor-pointer hover:bg-red-dark hover:text-white-primary transition-all duration-150'><FontAwesomeIcon icon={faFileArrowUp}/></button>
-                  <button onClick={() => exportLadder(ladderDataContext.value)} className='bg-red-primary px-3 py-1 rounded-sm hover:cursor-pointer hover:bg-red-dark hover:text-white-primary transition-all duration-150'><FontAwesomeIcon icon={faDownload}/></button>
+                  <button title='Reset Ladder' onClick={() => setShowModal(true)} className='bg-red-primary px-3 py-1 rounded-sm hover:cursor-pointer hover:bg-red-dark hover:text-white-primary transition-all duration-150'><FontAwesomeIcon icon={faTrash}/></button>
+                  <button title='Import from File' onClick={() => fileInputRef.current.click()} className='bg-red-primary px-3 py-1 rounded-sm hover:cursor-pointer hover:bg-red-dark hover:text-white-primary transition-all duration-150'><FontAwesomeIcon icon={faFileArrowUp}/></button>
+                  <button title='Download Ladder' onClick={() => exportLadder(ladderDataContext.value)} className='bg-red-primary px-3 py-1 rounded-sm hover:cursor-pointer hover:bg-red-dark hover:text-white-primary transition-all duration-150'><FontAwesomeIcon icon={faDownload}/></button>
                   <input
                     type="file"
                     accept=".darm"
@@ -82,7 +98,16 @@ const PLCeditor = () => {
                   />
                 </div>
               </div>
-              <div className='flex flex-grow bg-white-primary w-full flex-col overflow-hidden'>
+              <div className='flex flex-grow bg-white-primary w-full flex-col overflow-hidden relative'>
+                <div className={clsx('w-full h-full absolute flex justify-center items-center z-40 bg-[rgba(0,0,0,0.5)] ', showModal ? 'visible' : 'invisible')}>
+                  <div className='w-80 gap-6 bg-cream-primary flex flex-col items-center justify-between p-4 border-2 border-black-primary font-cascadia text-xs'>
+                    <p>Are you sure you want to reset the ladder? Any unsaved progress will be lost.</p>
+                    <div className='flex gap-2 text-white-primary pt-2 border-t-1 w-full justify-end border-red-primary'>
+                      <button onClick={() => resetLadder()} className='bg-red-primary px-3 py-1 rounded-xs hover:cursor-pointer hover:bg-red-dark transition-all duration-150'>Reset</button>
+                      <button onClick={() => setShowModal(false)} className='bg-cream-primary px-3 py-1 rounded-xs text-red-primary hover:cursor-pointer hover:bg-red-dark hover:text-white-primary transition-all duration-150 inset-ring-2 inset-ring-red-primary hover:inset-ring-red-dark'>Cancel</button>
+                    </div>
+                  </div>
+                </div>
                 <div className='w-full flex pr-[6px]'>
                   <div className=' font-cascadia text-xs flex justify-center items-center w-8 py-1 bg-peach-primary border-1 border-white-primary text-white-primary'>
                     No
@@ -97,6 +122,7 @@ const PLCeditor = () => {
                   </div>
                 </div>
                 <div className='w-full flex-grow bg-white-primary overflow-y-auto flex'>
+                  
                   <div className='grid grid-cols-1 grid-rows-[repeat(auto-fill,minmax(50px,1fr))] auto-rows-[minmax(50px,1fr)]'>
                     {Array.from({length: 100}).map((_, index) => {
                       return <div key={index} className=' h-[50px] flex justify-center items-center font-cascadia text-xs w-8 border-b-2 border-x-1 border-white-primary bg-peach-primary text-white-primary'>{index + 1}</div>
@@ -109,6 +135,7 @@ const PLCeditor = () => {
                       }
                       return <DnDCanvas key={index} running={running} index={index}/>
                     })}
+                      
                   </div>
                 </div>
                 <div className='w-full flex items-center bg-red-dark h-20 px-10 py-3 justify-between text-white font-cascadia text-xs'>

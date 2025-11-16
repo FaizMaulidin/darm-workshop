@@ -36,28 +36,17 @@ const DnDCanvas = ({type="contact", index, running}) => {
         }),
     })
 
-    const setLadderCellPart = (prop, value) => {
-        ladderCellContext.setValue({
-            ...ladderCellContext.value,
-            [type]: {
-                ...ladderCellContext.value[type],
-                [part.categ]: {
-                    ...ladderCellContext.value[type][part.categ],
-                    [part.name]: {
-                        ...ladderCellContext.value[type][part.categ][part.name],
-                        [prop]: value
-                    }
-                }
-            }
-        })
-    }
-
     useEffect(() => {
-        ladderDataContext.value.horizontal[index] 
-            ? ladderDataContext.value.horizontal[index].name === "wired" 
-                ? setWired(true) 
-                : setPart(ladderDataContext.value.horizontal[index])
-            : setPart(null)
+        if(ladderDataContext.value.horizontal[index]){
+            if(ladderDataContext.value.horizontal[index].name === "wired"){
+                setWired(true)
+            } else {
+                setPart(ladderDataContext.value.horizontal[index])
+            }
+        } else {
+            setPart(null)
+            setWired(false)
+        }
 
         ladderDataContext.value.vertical[index]
             ? setVWired(true)
