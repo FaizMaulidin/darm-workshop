@@ -12,7 +12,7 @@ const Button = ({variant="primary", size="md", children, armStatus, addClass="",
       };
       
     const sizeClasses = {
-        sm: "px-2 py-0.5 text-lg",
+        sm: "px-2 py-1 text-lg",
         md: "px-4 py-3 text-sm tracking-wider",
         control: "p-control text-xs tracking-widest",
         lg: "px-32 py-5 text-lg tracking-widest",

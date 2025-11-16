@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ModelViewer from '../components/layout/ModelViewer'
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
@@ -10,11 +10,56 @@ import TBExpandable from '../components/layout/TBExpandable'
 import ToolBoxCell from '../components/ui/ToolBoxCell'
 import { useLadderCellContext } from '../hooks/LadderCellProvider'
 import RunSimulation from '../components/ui/RunSimulation'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFileArrowUp, faDownload } from '@fortawesome/free-solid-svg-icons'
+import { useLadderDataContext } from '../hooks/LadderDataProvider'
 
 const PLCeditor = () => {
   const ladderCellContext = useLadderCellContext()
   const {contact, coil} = ladderCellContext.value
   const [running, setRunning] = useState(false)
+  const ladderDataContext = useLadderDataContext()
+  const fileInputRef = useRef(null)
+
+  function exportLadder(ladder) {
+    const blob = new Blob([JSON.stringify(ladder, null, 2)], {
+      type: "application/json",   // Content stays JSON
+    });
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ladder.darm";  // your custom extension
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  const importLadder = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        const validateData = typeof data === "object" && Array.isArray(data.horizontal) && Array.isArray(data.vertical)
+        if(!validateData) throw new Error("Invalid darm file")
+        ladderDataContext.setValue(data);
+        localStorage.setItem("ladderData", JSON.stringify(data));
+      } catch (err) {
+        alert("Invalid darm file");
+        console.log(err)
+      }
+    };
+
+    reader.readAsText(file);
+  };
+
+  useEffect(() => {
+    fileInputRef.current.value = ""
+  }, [ladderDataContext.value])
+
+  
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -23,7 +68,20 @@ const PLCeditor = () => {
                 <ModelViewer modelPath="./assets/assembly-robot-trial2.glb" mode="editor"/>
             </div>
             <div className="w-5/6 h-[calc(100%-5rem)] bg-cream-primary pb-4 pt-2 gap-2 px-4 flex justify-between flex-col">
-              <Heading variant="secondary">PLC LADDER EDITOR</Heading>
+              <div className='flex items-center justify-between'>
+                <Heading variant="secondary">PLC LADDER EDITOR</Heading>
+                <div className='flex gap-2 text-xl text-cream-primary'>
+                  <button onClick={() => fileInputRef.current.click()} className='bg-red-primary px-3 py-1 rounded-sm hover:cursor-pointer hover:bg-red-dark hover:text-white-primary transition-all duration-150'><FontAwesomeIcon icon={faFileArrowUp}/></button>
+                  <button onClick={() => exportLadder(ladderDataContext.value)} className='bg-red-primary px-3 py-1 rounded-sm hover:cursor-pointer hover:bg-red-dark hover:text-white-primary transition-all duration-150'><FontAwesomeIcon icon={faDownload}/></button>
+                  <input
+                    type="file"
+                    accept=".darm"
+                    ref={fileInputRef}
+                    style={{ display: "none" }}
+                    onChange={(e) => importLadder(e)}
+                  />
+                </div>
+              </div>
               <div className='flex flex-grow bg-white-primary w-full flex-col overflow-hidden'>
                 <div className='w-full flex pr-[6px]'>
                   <div className=' font-cascadia text-xs flex justify-center items-center w-8 py-1 bg-peach-primary border-1 border-white-primary text-white-primary'>
@@ -40,12 +98,12 @@ const PLCeditor = () => {
                 </div>
                 <div className='w-full flex-grow bg-white-primary overflow-y-auto flex'>
                   <div className='grid grid-cols-1 grid-rows-[repeat(auto-fill,minmax(50px,1fr))] auto-rows-[minmax(50px,1fr)]'>
-                    {Array.from({length: 20}).map((_, index) => {
+                    {Array.from({length: 100}).map((_, index) => {
                       return <div key={index} className=' h-[50px] flex justify-center items-center font-cascadia text-xs w-8 border-b-2 border-x-1 border-white-primary bg-peach-primary text-white-primary'>{index + 1}</div>
                     })}
                   </div>
                   <div className='grid grid-cols-6 px-[1px] gap-x-[1px] grid-rows-[repeat(auto-fill,minmax(50px,1fr))] auto-rows-[minmax(50px,1fr)] flex-grow'>
-                    {Array.from({length: 120}).map((_, index) => {
+                    {Array.from({length: 600}).map((_, index) => {
                       if(index % 6 === 5) {
                         return <DnDCanvas key={index} running={running} index={index} type="coil"/>
                       }
@@ -53,7 +111,7 @@ const PLCeditor = () => {
                     })}
                   </div>
                 </div>
-                <div className='w-full flex items-center bg-red-dark h-20 px-10 justify-between text-white font-cascadia text-xs'>
+                <div className='w-full flex items-center bg-red-dark h-20 px-10 py-3 justify-between text-white font-cascadia text-xs'>
                   <div className='flex gap-3 items-center'>
                     <div>Toolbox: </div>
                     <TBExpandable title="Inputs">
