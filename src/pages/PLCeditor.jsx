@@ -76,6 +76,16 @@ const PLCeditor = () => {
     setShowModal(false)
   }
 
+  const removeItem = (from) => {
+    ladderDataContext.setValue(prev => ({
+      ...prev,
+      horizontal: prev.horizontal.map((item, index) => {
+        if(index === from) return null
+        return item
+      })
+    }))
+  }
+
   return (
     <DndProvider backend={HTML5Backend}>
         <div className='flex justify-between h-screen w-full max-w-screen items-end'>
@@ -131,9 +141,9 @@ const PLCeditor = () => {
                   <div className='grid grid-cols-6 px-[1px] gap-x-[1px] grid-rows-[repeat(auto-fill,minmax(50px,1fr))] auto-rows-[minmax(50px,1fr)] flex-grow'>
                     {Array.from({length: 600}).map((_, index) => {
                       if(index % 6 === 5) {
-                        return <DnDCanvas key={index} running={running} index={index} type="coil"/>
+                        return <DnDCanvas key={index} running={running} index={index} type="coil" canvasID={index} removeItem={removeItem}/>
                       }
-                      return <DnDCanvas key={index} running={running} index={index}/>
+                      return <DnDCanvas key={index} running={running} index={index} canvasID={index} removeItem={removeItem}/>
                     })}
                       
                   </div>

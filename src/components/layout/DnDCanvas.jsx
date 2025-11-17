@@ -3,8 +3,9 @@ import { useDrop } from 'react-dnd'
 import clsx from 'clsx'
 import { useLadderCellContext } from '../../hooks/LadderCellProvider'
 import { useLadderDataContext } from '../../hooks/LadderDataProvider'
+import DraggableItem from '../ui/DraggableItem'
 
-const DnDCanvas = ({type="contact", index, running}) => {
+const DnDCanvas = ({type="contact", index, running, canvasID, removeItem}) => {
     const [part, setPart] = useState(null)
     const [wired, setWired] = useState(false)
     const [vWired, setVWired] = useState(false)
@@ -23,13 +24,16 @@ const DnDCanvas = ({type="contact", index, running}) => {
             })
             if(exist) return
             setWired(false)
-            const ladderItem = {...ladderCellContext.value[item.type][item.categ][item.name], NOpened: true}
+            const oldItem = {...ladderCellContext.value[item.type][item.categ][item.name]}
+            const ladderItem = {...oldItem, NOpened: item.NOpened !== undefined ? item.NOpened : true, from: canvasID}
             setPart(ladderItem)
             ladderDataContext?.setValue(prev => {
                 const newValue = [...prev.horizontal]
                 newValue[index] = ladderItem
                 return {horizontal: newValue, vertical: prev.vertical}
             })
+
+            return {to: canvasID, from: item?.from}
         },
         collect: (monitor) => ({
             isOver: monitor.isOver(),
@@ -41,7 +45,7 @@ const DnDCanvas = ({type="contact", index, running}) => {
             if(ladderDataContext.value.horizontal[index].name === "wired"){
                 setWired(true)
             } else {
-                setPart(ladderDataContext.value.horizontal[index])
+                setPart({...ladderDataContext.value.horizontal[index], from: canvasID})
             }
         } else {
             setPart(null)
@@ -71,68 +75,70 @@ const DnDCanvas = ({type="contact", index, running}) => {
         }}} 
     className={clsx(' w-full flex justify-center items-center relative border-b-2 border-black-fade', isOver && 'opacity-50')}>
         {part?.type && (
-            <div className='bg-black-primary h-[1px] w-full'>
-                <p className='text-xs absolute top-0 left-1 font-cascadia'>{part.name.includes("R") || part.type == "contact" ? part.name : "["+part.name}</p>
-                {(!running) && (<button onClick={() => {
-                    if(running) return
-                    ladderDataContext.setValue(prev => {
-                        const newValue = [...prev.horizontal]
-                        newValue[index] = null
-                        return {horizontal: newValue, vertical: prev.vertical}
-                    })
-                    setPart(null)
-                }} className='absolute top-1 right-1 text-xs font-cascadia cursor-pointer bg-red-primary px-1 rounded-sm text-white-primary transition-all duration-150'>X</button>)}
-                <div className='text-xs absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-cascadia'>{
-                    part.type === "contact" 
-                        ? part.NOpened
-                            ? ladderCellContext.value[type][part.categ][part.name].state && !ladderCellContext.value[type][part.categ]["R"+part.name]?.state 
+            <DraggableItem ladderCell={part} mode="canvas" removeItem={removeItem}>
+                <div className='bg-black-primary h-[1px] w-full'>
+                    <p className='text-xs absolute top-0 left-1 font-cascadia'>{part.name.includes("R") || part.type == "contact" ? part.name : "["+part.name}</p>
+                    {(!running) && (<button onClick={() => {
+                        if(running) return
+                        ladderDataContext.setValue(prev => {
+                            const newValue = [...prev.horizontal]
+                            newValue[index] = null
+                            return {horizontal: newValue, vertical: prev.vertical}
+                        })
+                        setPart(null)
+                    }} className='absolute top-1 right-1 text-xs font-cascadia cursor-pointer bg-red-primary px-1 rounded-sm text-white-primary transition-all duration-150'>X</button>)}
+                    <div className='text-xs absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-cascadia'>{
+                        part.type === "contact" 
+                            ? part.NOpened
+                                ? ladderCellContext.value[type][part.categ][part.name].state && !ladderCellContext.value[type][part.categ]["R"+part.name]?.state 
+                                    ? (
+                                        <div className='w-8 h-8 bg-white-primary flex justify-center items-center'>
+                                            <div className='w-full h-[3px] bg-red-primary origin-right'></div>
+                                        </div>
+                                    )
+                                    : (
+                                        <div className='w-8 h-8 bg-white-primary flex justify-center items-center'>
+                                            <div className='w-full h-[3px] bg-black-primary origin-right rotate-24'></div>
+                                        </div>
+                                    )
+                                : ladderCellContext.value[type][part.categ][part.name].state && !ladderCellContext.value[type][part.categ]["R"+part.name]?.state 
+                                    ? (
+                                        <div className='w-8 h-8 bg-white-primary flex justify-start items-center relative'>
+                                            <div className='w-[2px] h-2.5 bg-black-primary -translate-y-1'></div>
+                                            <div className='w-8 h-[3px] bg-black-primary origin-right rotate-28 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'></div>
+                                        </div>
+                                    )
+                                    : (
+                                        <div className='w-8 h-8 bg-white-primary flex justify-start items-center relative'>
+                                            <div className={clsx('w-[2px] h-2.5 -translate-y-1', running ? 'bg-red-primary' : 'bg-black-primary')}></div>
+                                            <div className={clsx('w-8 h-[3px] origin-right rotate-15 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2', running ? 'bg-red-primary' : 'bg-black-primary')}></div>
+                                        </div>
+                                    )
+                            : ladderCellContext.value[type][part?.categ][part?.name].state 
                                 ? (
-                                    <div className='w-8 h-8 bg-white-primary flex justify-center items-center'>
-                                        <div className='w-full h-[3px] bg-red-primary origin-right'></div>
+                                    <div className='w-5 h-5 bg-white-primary border-1 border-black-primary p-[2px]'>
+                                        <div className='w-full h-full bg-red-primary'></div>
                                     </div>
                                 )
                                 : (
-                                    <div className='w-8 h-8 bg-white-primary flex justify-center items-center'>
-                                        <div className='w-full h-[3px] bg-black-primary origin-right rotate-24'></div>
-                                    </div>
+                                    <div className='w-5 h-5 bg-white-primary border-1 border-black-primary'></div>
                                 )
-                            : ladderCellContext.value[type][part.categ][part.name].state && !ladderCellContext.value[type][part.categ]["R"+part.name]?.state 
-                                ? (
-                                    <div className='w-8 h-8 bg-white-primary flex justify-start items-center relative'>
-                                        <div className='w-[2px] h-2.5 bg-black-primary -translate-y-1'></div>
-                                        <div className='w-8 h-[3px] bg-black-primary origin-right rotate-28 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'></div>
-                                    </div>
-                                )
-                                : (
-                                    <div className='w-8 h-8 bg-white-primary flex justify-start items-center relative'>
-                                        <div className={clsx('w-[2px] h-2.5 -translate-y-1', running ? 'bg-red-primary' : 'bg-black-primary')}></div>
-                                        <div className={clsx('w-8 h-[3px] origin-right rotate-15 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2', running ? 'bg-red-primary' : 'bg-black-primary')}></div>
-                                    </div>
-                                )
-                        : ladderCellContext.value[type][part?.categ][part?.name].state 
-                            ? (
-                                <div className='w-5 h-5 bg-white-primary border-1 border-black-primary p-[2px]'>
-                                    <div className='w-full h-full bg-red-primary'></div>
-                                </div>
-                            )
-                            : (
-                                <div className='w-5 h-5 bg-white-primary border-1 border-black-primary'></div>
-                            )
-                }</div>
-                {(part.type === "contact" && !running) && (
-                    <button
-                        onClick={() => {
-                            if(running) return
-                            ladderDataContext.setValue(prev => {
-                                const newValue = [...prev.horizontal]
-                                newValue[index].NOpened = !newValue[index].NOpened
-                                return {horizontal: newValue, vertical: prev.vertical}
-                            })
-                        }}
-                    className='text-[0.625rem] absolute bottom-1 left-0.5 font-cascadia cursor-pointer bg-blue-primary px-1 rounded-xs text-white-primary transition-all duration-150'
-                    >{part.NOpened ? "NO" : "NC"}</button>
-                )}
-            </div>
+                    }</div>
+                    {(part.type === "contact" && !running) && (
+                        <button
+                            onClick={() => {
+                                if(running) return
+                                ladderDataContext.setValue(prev => {
+                                    const newValue = [...prev.horizontal]
+                                    newValue[index].NOpened = !newValue[index].NOpened
+                                    return {horizontal: newValue, vertical: prev.vertical}
+                                })
+                            }}
+                        className='text-[0.625rem] absolute bottom-1 left-0.5 font-cascadia cursor-pointer bg-blue-primary px-1 rounded-xs text-white-primary transition-all duration-150'
+                        >{part.NOpened ? "NO" : "NC"}</button>
+                    )}
+                </div>
+            </DraggableItem>
         )}
         {!part && wired && (
             <div className='bg-black-primary h-[1px] w-full'></div>
