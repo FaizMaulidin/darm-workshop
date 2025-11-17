@@ -18,7 +18,8 @@ const DnDCanvas = ({type="contact", index, running, canvasID, removeItem}) => {
             if(running) return
             let exist = false
             ladderDataContext.value.horizontal.map((coil) => {
-                if(coil?.name === item?.name && item?.type === coil?.type && coil?.type === "coil"){
+                if(coil?.name === item?.name && item?.type === coil?.type && coil?.type === "coil" && item?.from === undefined){
+                    console.log(item?.from)
                     exist = true
                 }
             })
