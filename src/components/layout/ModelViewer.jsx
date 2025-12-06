@@ -134,6 +134,9 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
         
         if(mode === "simulation") {
           modelContext.current.runSimulation = true
+          modelContext.current.mode = "simulation"
+          modelContext.current.status.busy = false
+          modelContext.current.status.gpOpened = false
           modelContext.current.status.armStatus = ""
           modelContext.current.handlePartsMovement.fullSimulation()
         } else {
@@ -151,6 +154,9 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
 
           if(mode === "editor") {
             controls.minDistance = 1
+            modelContext.current.mode = "editor"
+          } else {
+            modelContext.current.mode = "explore"
           }
         }
 

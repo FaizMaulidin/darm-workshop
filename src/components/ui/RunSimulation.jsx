@@ -165,9 +165,9 @@ const RunSimulation = ({running, setRunning}) => {
         const status = statusContext.value.status
         if(status.busy) return
         if(outputs.Q4.state && !outputs.RQ4.state && !status.gpOpened && running){
-            handlePartsMovement?.openGripper()
+            handlePartsMovement?.openGripper(false, "editor")
         } else if((!outputs.Q4.state || outputs.RQ4.state) && status.gpOpened && running){
-            handlePartsMovement?.closeGripper(true)
+            handlePartsMovement?.closeGripper("editor")
         }
 
         const Q1 = outputs.Q1.state && !outputs.RQ1.state ? 1 : 0
@@ -180,13 +180,13 @@ const RunSimulation = ({running, setRunning}) => {
                 handlePartsMovement?.armPosition.getBody()
                 break;
             case 2:
-                handlePartsMovement?.armPosition.assembleBody(true)
+                handlePartsMovement?.armPosition.assembleBody("editor")
                 break;
             case 3:
                 handlePartsMovement?.armPosition.getPiston()
                 break;
             case 4:
-                handlePartsMovement?.armPosition.assemblePiston()
+                handlePartsMovement?.armPosition.assemblePiston("editor")
                 break;
             case 5:
                 handlePartsMovement?.armPosition.getSpring()
@@ -195,7 +195,7 @@ const RunSimulation = ({running, setRunning}) => {
                 handlePartsMovement?.armPosition.getCap()
                 break;
             case 7:
-                handlePartsMovement?.armPosition.assembleCap()
+                handlePartsMovement?.armPosition.assembleCap("editor")
                 break;
             default:
                 handlePartsMovement?.armPosition.homePosition()
@@ -339,6 +339,9 @@ const RunSimulation = ({running, setRunning}) => {
                 if(modelContext.current.partsRef.fsExtended){
                     handlePartsMovement.unfeedSpring()
                 }
+                modelContext.current.ladderRun = false
+            } else {
+                modelContext.current.ladderRun = true
             }
             handlePartsMovement.resetStation()
             setRunning(!running)

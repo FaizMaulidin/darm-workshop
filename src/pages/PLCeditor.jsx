@@ -216,12 +216,9 @@ const PLCeditor = () => {
                       <ToolBoxCell><DraggableItem ladderCell={coil.outputs.RQ7}>R</DraggableItem></ToolBoxCell>
                       <ToolBoxCell justify='start'>Feed Cap</ToolBoxCell>
                     </TBExpandable>
-                    <TBExpandable title="Memory">
-                      <ToolBoxCell color='black'>No</ToolBoxCell>
-                      <ToolBoxCell color='red'></ToolBoxCell>
-                      <ToolBoxCell color='blue'></ToolBoxCell>
-                      <ToolBoxCell color='blue'></ToolBoxCell>
-                      <ToolBoxCell>01</ToolBoxCell>
+                    <TBExpandable title="Memory" data={{contact, coil}}>
+                      
+                      {/* <ToolBoxCell>01</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.M1}>M1</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.M1}>{"["}</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.RM1}>R</DraggableItem></ToolBoxCell>
@@ -268,7 +265,7 @@ const PLCeditor = () => {
                       <ToolBoxCell>12</ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={contact.memory.MC}>MC</DraggableItem></ToolBoxCell>
                       <ToolBoxCell><DraggableItem ladderCell={coil.memory.MC}>{"["}</DraggableItem></ToolBoxCell>
-                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.RMC}>R</DraggableItem></ToolBoxCell>
+                      <ToolBoxCell><DraggableItem ladderCell={coil.memory.RMC}>R</DraggableItem></ToolBoxCell> */}
                     </TBExpandable>
                   </div>
                   <RunSimulation running={running} setRunning={setRunning}/>

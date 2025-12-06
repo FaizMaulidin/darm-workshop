@@ -47,8 +47,8 @@ const SimulationPage = () => {
             </div>
             {mode === "explore" && <ExpandablePanel heading="CONTROL PANEL">
                 <SubPanel subHeading="Gripper">
-                    <Button variant="control" size="control" onClick={() => handlePartsMovement?.openGripper()}>Open Gripper</Button>
-                    <Button variant="control" size="control" onClick={() => handlePartsMovement?.closeGripper()}>Close Gripper</Button>
+                    <Button variant="control" size="control" onClick={() => handlePartsMovement?.openGripper(false, "explore")}>Open Gripper</Button>
+                    <Button variant="control" size="control" onClick={() => handlePartsMovement?.closeGripper("explore")}>Close Gripper</Button>
                 </SubPanel>
                 <SubPanel subHeading="Magazine">
                     <Button variant="control" size="control" onClick={() => {if(!modelContext?.current?.status?.busy)handlePartsMovement?.feedCap(true)}}>Feed Cap</Button>
@@ -91,19 +91,19 @@ const SimulationPage = () => {
                     <Button 
                         variant="control" 
                         size="control" 
-                        onClick={(el) => handleClick(el, handlePartsMovement?.armPosition?.assembleBody)} 
+                        onClick={(el) => handleClick(el, () => handlePartsMovement?.armPosition?.assembleBody("explore"))} 
                         // armStatus={armStatus}
                     >Assemble Body</Button>
                     <Button 
                         variant="control" 
                         size="control" 
-                        onClick={(el) => handleClick(el, handlePartsMovement?.armPosition?.assemblePiston)} 
+                        onClick={(el) => handleClick(el, () => handlePartsMovement?.armPosition?.assemblePiston("explore"))} 
                         // armStatus={armStatus}
                     >Assemble Piston/Spring</Button>
                     <Button 
                         variant="control" 
                         size="control" 
-                        onClick={(el) => handleClick(el, handlePartsMovement?.armPosition?.assembleCap)} 
+                        onClick={(el) => handleClick(el, () => handlePartsMovement?.armPosition?.assembleCap("explore"))} 
                         // armStatus={armStatus}
                     >Assemble Cap & Send Cylinder</Button>
                 </SubPanel>
