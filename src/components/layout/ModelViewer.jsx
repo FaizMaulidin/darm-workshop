@@ -26,6 +26,8 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
     const spinner = document.createElement('div');
     spinner.className = 'animate-spin rounded-full h-20 w-20 border-10 border-slate-400 border-t-transparent';
     container.appendChild(spinner);
+    renderer.domElement.style.display = "none"
+    container.appendChild(renderer.domElement)
 
     // Scene & Camera
     const scene = new THREE.Scene();
@@ -168,7 +170,8 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
       (xhr) => {
         console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
         if(xhr.loaded === xhr.total){
-          container.replaceChildren(renderer.domElement);
+          renderer.domElement.style.display = "flex"
+          container.removeChild(spinner)
         }
       },
       (err) => {
