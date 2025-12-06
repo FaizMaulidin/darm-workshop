@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
@@ -24,10 +24,8 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
     renderer.toneMapping = THREE.NoToneMapping;
     
     const spinner = document.createElement('div');
-    spinner.className = 'animate-spin rounded-full h-20 w-20 border-10 border-slate-400 border-t-transparent';
+    spinner.className = 'animate-spin rounded-full h-20 w-20 border-8 border-slate-400 border-t-transparent';
     container.appendChild(spinner);
-    renderer.domElement.style.display = "none"
-    container.appendChild(renderer.domElement)
 
     // Scene & Camera
     const scene = new THREE.Scene();
@@ -170,8 +168,7 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
       (xhr) => {
         console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
         if(xhr.loaded === xhr.total){
-          renderer.domElement.style.display = "flex"
-          container.removeChild(spinner)
+          container.replaceChild(renderer.domElement, spinner)
         }
       },
       (err) => {
@@ -218,7 +215,9 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
           }
         }
       });
-      container.removeChild(renderer.domElement);
+      if(container.contains(renderer.domElement)){
+        container.removeChild(renderer.domElement);
+      }
     };
   }, [modelPath, backgroundColor, enableShadows, mode]);
 
