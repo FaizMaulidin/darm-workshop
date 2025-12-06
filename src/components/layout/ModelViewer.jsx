@@ -168,7 +168,8 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
       (xhr) => {
         console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
         if(xhr.loaded === xhr.total){
-          container.replaceChild(renderer.domElement, spinner)
+          container.appendChild(renderer.domElement)
+          spinner.style.display = "none"
         }
       },
       (err) => {
