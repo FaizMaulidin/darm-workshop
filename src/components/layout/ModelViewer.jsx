@@ -22,7 +22,10 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
     renderer.shadowMap.enabled = enableShadows;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.NoToneMapping;
-    container.appendChild(renderer.domElement);
+    
+    const spinner = document.createElement('div');
+    spinner.className = 'animate-spin rounded-full h-20 w-20 border-10 border-slate-400 border-t-transparent';
+    container.appendChild(spinner);
 
     // Scene & Camera
     const scene = new THREE.Scene();
@@ -164,6 +167,9 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
       },
       (xhr) => {
         console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+        if(xhr.loaded === xhr.total){
+          container.replaceChildren(renderer.domElement);
+        }
       },
       (err) => {
         console.error("Error loading model:", err);
@@ -213,6 +219,6 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
     };
   }, [modelPath, backgroundColor, enableShadows, mode]);
 
-  return<div ref={containerRef} className="h-screen w-full min-h-[400px]" /> 
+  return<div ref={containerRef} className="h-screen w-full bg-black-primary min-h-[400px] flex justify-center items-center" /> 
     
 }
