@@ -169,6 +169,7 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
         scene.add(model);
       },
       (xhr) => {
+        console.log(xhr)
         if(xhr.loaded === xhr.total){
           console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
           setTimeout(() => {
