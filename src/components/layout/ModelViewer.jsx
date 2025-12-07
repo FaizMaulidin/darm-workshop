@@ -5,13 +5,19 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { useModelContext } from "../../hooks/ModelProvider";
 import gsap from "gsap";
 
+const LoadingSpinner = () => {
+  return <div className="flex justify-center items-center w-full h-full bg-black-primary absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2"><div className="animate-spin rounded-full h-20 w-20 border-8 border-slate-400 border-t-transparent"/></div>
+}
+
 export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30, 35)", enableShadows = true, mode = "simulation" }) {
   const containerRef = useRef();
   const modelContext = useModelContext()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container && !loading) return;
+    setLoading(true)
 
     // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -22,10 +28,7 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
     renderer.shadowMap.enabled = enableShadows;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.NoToneMapping;
-    
-    const spinner = document.createElement('div');
-    spinner.className = 'animate-spin rounded-full h-20 w-20 border-8 border-slate-400 border-t-transparent';
-    container.appendChild(spinner);
+    container.appendChild(renderer.domElement)
 
     // Scene & Camera
     const scene = new THREE.Scene();
@@ -166,10 +169,11 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
         scene.add(model);
       },
       (xhr) => {
-        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
         if(xhr.loaded === xhr.total){
-          container.appendChild(renderer.domElement)
-          spinner.style.display = "none"
+          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+          setTimeout(() => {
+            setLoading(false)
+          }, 100);
         }
       },
       (err) => {
@@ -216,12 +220,13 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
           }
         }
       });
-      if(container.contains(renderer.domElement)){
         container.removeChild(renderer.domElement);
-      }
     };
   }, [modelPath, backgroundColor, enableShadows, mode]);
 
-  return<div ref={containerRef} className="h-screen w-full bg-black-primary min-h-[400px] flex justify-center items-center" /> 
+  return<div className="h-screen w-full bg-black-primary min-h-[400px] flex justify-center items-center relative">
+    {loading ? <LoadingSpinner/> : <></>}
+    <div className=" w-full h-full " ref={containerRef}></div>
+  </div> 
     
 }
