@@ -335,7 +335,7 @@ const RunSimulation = ({running, setRunning}) => {
         <button className='bg-green-primary px-2 py-1 rounded-xs text-black-primary hover:text-red-primary transition-all duration-300 cursor-pointer' onClick={() => {
             if(running){
                 handlePartsMovement.armPosition.homePosition(false, true)
-                handlePartsMovement.closeGripper()
+                handlePartsMovement.closeGripper("editor")
                 if(modelContext.current.partsRef.fsExtended){
                     handlePartsMovement.unfeedSpring()
                 }
