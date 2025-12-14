@@ -56,7 +56,7 @@ const SimulationPage = () => {
         if(step === 0 && modelContext?.current?.status.armStatus == "getBody"){
             setStep(prev => prev + 1)
         }
-        if(!status.bodyPresent && step === 1 && modelContext?.current?.status.armStatus == "homePosition"){
+        if(step === 1 && modelContext?.current?.status.armStatus === "assembleBody" && !status.busy){
             setStep(prev => prev + 1)
         }
         if(status.springPresent && step === 2){
@@ -75,8 +75,6 @@ const SimulationPage = () => {
                 setStep(0)
             }, 1000);
         }
-        console.log(modelContext?.current?.status.armStatus)
-        console.log(status.busy)
     }, [status, mode])
 
     const texts = {
