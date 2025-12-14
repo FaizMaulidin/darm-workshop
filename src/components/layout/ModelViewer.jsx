@@ -63,8 +63,8 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
     controls.enablePan = false
     controls.minPolarAngle = 0;           // minimum angle (down)
     controls.maxPolarAngle = Math.PI / 2;
-    controls.minDistance = 0.5;
-    controls.maxDistance = 2;
+    controls.minDistance = 1.2;
+    controls.maxDistance = 1.7;
     controls.target.set(0, 0.9, 0);
 
     // Loader
@@ -159,7 +159,6 @@ export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30,
           modelContext.current.partsRef.bodyFeeder.visible = false
 
           if(mode === "editor") {
-            controls.minDistance = 1
             modelContext.current.mode = "editor"
           } else {
             modelContext.current.mode = "explore"

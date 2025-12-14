@@ -1,4 +1,4 @@
-import React, { useRef, createContext, useContext, useState, useEffect} from 'react'
+import React, { useRef, createContext, useContext} from 'react'
 import gsap from 'gsap'
 import * as THREE from 'three'
 import {useStatusContext} from "./StatusProvider"

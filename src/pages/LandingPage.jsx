@@ -1,9 +1,25 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Button from '../components/ui/Button'
 import { Link } from 'react-router-dom'
 import Paragraph from '../components/ui/Paragraph'
+import {useStatusContext} from '../hooks/StatusProvider'
 
 const LandingPage = () => {
+    const statusContext = useStatusContext()
+
+    useEffect(() => {
+        statusContext.setValue({
+            status: {
+                busy: false,
+                gpOpened: false,
+                capPresent: false,
+                springPresent: false,
+                pistonPresent: true,
+                bodyPresent: true,
+            }
+        })
+    }, [])
+    
     return (
         <div className="flex justify-between items-center h-screen flex-col pt-28 pb-8 bg-black-primary">
             <div className='text-cream-primary h-64 w-1/2 rounded-full font-cascadia font-extralight text-9xl flex justify-center items-center text-center flex-col tracking-widest'>

@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* @keyframes stutter-lamp {
+    0%,
+    100%{opacity: 1}
+} */
+
 @theme{
     --color-red-primary: #bd4b64;
     --color-red-dark: #9c3a4f;
@@ -24,6 +29,33 @@
     --font-iceland: "Iceland", sans-serif;
     --font-cascadia: "Cascadia Code", monospace;
     --font-poppins: "Poppins", sans-serif;
+
+    --animate-stutter-lamp: stutter-lamp 1s ease-in-out forwards;
+    --animate-exit-explain: exit-explain 0.75s ease-in-out forwards;
+    @keyframes exit-explain {
+        0%{
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        70%{
+            transform: translateY(0px) scale(0.8);
+        }
+        100%{
+            transform: translateY(-100px) scale(0.8);
+            opacity: 0;
+        }
+    }
+    @keyframes stutter-lamp {
+        0%{
+            transform: translateX(100px);
+            opacity: 0
+        }
+        100%{
+            transform: translateX(0);
+            opacity: 1
+        }
+    }
+
 }
 
 * {

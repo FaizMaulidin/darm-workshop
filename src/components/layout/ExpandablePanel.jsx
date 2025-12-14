@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGears, faLightbulb } from '@fortawesome/free-solid-svg-icons'
 
 const ExpandablePanel = ({children, heading, position="right"}) => {
-  const [isExpanded, setIsExpanded] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(true)
 
   return (
     <div className={clsx('bg-transparent h-fit fixed z-50 top-20 w-fit p-6 font-iceland text-black flex justify-end items-start gap-2', position === "right" ? "right-0" : "left-0")}>
