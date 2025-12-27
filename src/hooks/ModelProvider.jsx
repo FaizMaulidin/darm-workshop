@@ -111,12 +111,12 @@ const ModelProvider = ({children}) => {
                     value.current.status.busy = false
                     statusContext.setValue((prev) => ({status: {...prev.status, capPresent: true}}))
                 }})
+                const zPos = value.current.partsRef.capClone.position.z
+                if(zPos < 0.165) return
                 tl
                     .add(() => value.current.partsRef.capFeeder.visible = false)
                     .add(() => {
-                        const zPos = value.current.partsRef.capClone.position.z
                         if(!explore && !value.current.runSimulation) return
-                        if(zPos < 0.165) return
                         gsap.to(value.current.partsRef.capClone.position, {z: "-=0.065", duration: 0.7})
                     })
                     .to(value.current.partsRef.fcPusher.position, {z: "-=0.065", duration: 0.7}, "<")

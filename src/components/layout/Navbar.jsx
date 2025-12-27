@@ -12,8 +12,7 @@ const Navbar = () => {
             <Link to="/"><Button variant="nav" size="sm">HOME</Button></Link>
             <Link to="/simulation"><Button variant="nav" size="sm">SIMULATION</Button></Link>
             <Link to="/plc-editor"><Button variant="nav" size="sm">PLC EDITOR</Button></Link>
-            <Link to="/guide"><Button variant="nav" size="sm">GUIDE</Button></Link>
-            <Link to="/about"><Button variant="nav" size="sm">ABOUT</Button></Link>
+            <Link to="/guide"><Button variant="nav" size="sm">DOCUMENTATION</Button></Link>
         </div>
     </div>
   )

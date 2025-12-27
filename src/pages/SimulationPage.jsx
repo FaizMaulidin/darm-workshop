@@ -163,7 +163,7 @@ const SimulationPage = () => {
                         size="control" 
                         onClick={(el) => handleClick(el, () => handlePartsMovement?.armPosition?.assembleCap("explore"))} 
                         // armStatus={armStatus}
-                    >Assemble Cap & Send Cylinder</Button>
+                    >Assemble Cap & Send Product</Button>
                 </SubPanel>
             </ExpandablePanel>}
             <ExpandablePanel position="left" heading="STATUS PANEL">

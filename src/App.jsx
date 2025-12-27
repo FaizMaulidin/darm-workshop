@@ -9,6 +9,7 @@ import PLCeditor from './pages/PLCeditor'
 import LadderCellProvider from './hooks/LadderCellProvider'
 import LadderDataProvider from './hooks/LadderDataProvider'
 import { useState, useEffect } from 'react'
+import GuidePage from './pages/GuidePage'
 
 function useMinWidth(breakpoint = 1200) {
   const [isWide, setIsWide] = useState(window.innerWidth >= breakpoint);
@@ -40,6 +41,7 @@ function App() {
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/simulation" element={<SimulationPage/>} />
                 <Route path="/plc-editor" element={<PLCeditor/>} />
+                <Route path="/guide" element={<GuidePage/>} />
               </Routes>
             </LadderCellProvider>
           </LadderDataProvider>
