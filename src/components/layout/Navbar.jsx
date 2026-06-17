@@ -5,8 +5,8 @@ import Button from '../ui/Button'
 const Navbar = () => {
   return (
     <div className='fixed top-0 left-0 right-0 z-50 bg-black-primary shadow-lg text-red-primary flex justify-between items-center h-20 font-iceland px-20'>
-        <div>
-            LOGO
+        <div className=' h-1/2'>
+            <Link to="/"><img className='h-full' src="./assets/darm-logo-text.png" alt="" /></Link>
         </div>
         <div className='flex gap-16 text-lg'>
             <Link to="/"><Button variant="nav" size="sm">HOME</Button></Link>
