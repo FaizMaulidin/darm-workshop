@@ -32,6 +32,7 @@
 
     --animate-stutter-lamp: stutter-lamp 1s ease-in-out forwards;
     --animate-exit-explain: exit-explain 0.75s ease-in-out forwards;
+    --animate-pulse-loading: pulse 0.7s ease-in-out infinite;
     @keyframes exit-explain {
         0%{
             transform: translateY(0) scale(1);

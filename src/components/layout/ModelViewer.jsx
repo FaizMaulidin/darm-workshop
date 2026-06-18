@@ -6,7 +6,12 @@ import { useModelContext } from "../../hooks/ModelProvider";
 import gsap from "gsap";
 
 const LoadingSpinner = () => {
-  return <div className="flex justify-center items-center w-full h-full bg-black-primary absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2"><div className="animate-spin rounded-full h-20 w-20 border-8 border-slate-400 border-t-transparent"/></div>
+  return (
+    <div className="flex flex-col justify-center items-center w-full h-full bg-black-primary absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 gap-1">
+      {/* <div className="animate-spin rounded-full h-32 w-32 border-4 border-red-primary relative border-t-transparent" /> */}
+      <img src="./assets/darmGIF.gif" alt="Loading..." className="w-28 h-21 animate-pulse-loading" />
+    </div>
+  )
 }
 
 export default function ModelViewer({ modelPath, backgroundColor = "rgba(27, 30, 35)", enableShadows = true, mode = "simulation" }) {
