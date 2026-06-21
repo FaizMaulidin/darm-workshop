@@ -22,9 +22,10 @@ const LandingPage = () => {
     
     return (
         <div className="flex justify-between items-center h-screen flex-col pt-28 pb-8 bg-black-primary">
-            <div className='text-cream-primary h-64 w-1/2 rounded-full font-cascadia font-extralight text-9xl flex justify-center items-center text-center flex-col tracking-widest'>
-                <h1 className='font-bold'>DARM</h1>
-                <h1 className='text-2xl tracking-[0.8em]'>WORKSHOP</h1>
+            <div className='text-cream-primary h-64 w-1/2 rounded-full font-cascadia font-extralight text-9xl flex justify-center items-center text-center flex-col tracking-widest gap-8'>
+                {/* <h1 className='font-bold'>DARM</h1> */}
+                <img className='h-28' src="./assets/darm-fonted.png" alt="" />
+                <h1 className='text-xl tracking-[1.2em] text-center pl-[1.2em]'>WORKSHOP</h1>
             </div>
             <div className='flex justify-center items-center gap-6'>
                 <Link to="/simulation"><Button variant='primary' size='lg'>START SIMULATION</Button></Link>

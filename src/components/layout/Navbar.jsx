@@ -14,6 +14,7 @@ const Navbar = () => {
             <Link to="/plc-editor"><Button variant="nav" size="sm">PLC EDITOR</Button></Link>
             <Link to="/guide"><Button variant="nav" size="sm">DOCUMENTATION</Button></Link>
         </div>
+        <img className='w-[2.75rem] h-[2.75rem] saturate-40' src="./assets/logo-uny.png" alt="" />
     </div>
   )
 }
